@@ -61,7 +61,7 @@ void playGame(int *balance) {
         printf("| Insufficient balance! |\n");
         printf("| Add coins or Exit.   |\n");
         printf("+---------------------+\n");
-        for (int i = 0; i < 2000000000; i++); // Простая задержка вместо Sleep
+        for (int i = 0; i < 2000000000; i++);
         return;
     }
 
