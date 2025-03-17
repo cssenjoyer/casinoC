@@ -5,7 +5,7 @@
 #include <conio.h>
 
 void clearScreen() {
-    system("cls"); 
+    system("cls");
 }
 
 void drawFrame() {
@@ -45,15 +45,20 @@ void showRules() {
     printf("| 2. BINGO = MAX WIN |\n");
     printf("| Symbols: |, L, 7, Sun |\n");
     printf("| - Stake: 10 coins  |\n");
-    printf("| - Small Win (2): 20 coins |\n");
-    printf("| - MAX WIN (3): 100 coins |\n");
+    printf("| - Big Win (2 + Multiplier): 50 x Multiplier |\n");
+    printf("| - MAX WIN (3 identical): 100 coins |\n");
+    printf("| Multipliers: x2, x3, x5, x10, x25 |\n");
     printf("+---------------------+\n");
     printf("Press Enter...");
+    _getch();
 }
 
 void playGame(int *balance) {
-    char* symbols[] = {"|", "L", "7", "Sun"};
+    char* symbols[] = {"7", "BAR", "Sun", "MAX"};
+    char* multipliers[] = {"x2", "x3", "x5", "x10", "x25"};
     int reel1, reel2, reel3;
+    int multiplier_index = -1;
+    int multiplier_value = 1;
 
     if (*balance < 10) {
         clearScreen();
@@ -65,9 +70,7 @@ void playGame(int *balance) {
         return;
     }
 
-
     *balance -= 10;
-
 
     clearScreen();
     drawFrame();
@@ -75,18 +78,68 @@ void playGame(int *balance) {
     printf("| Spinning...          |\n");
     printf("+---------------------+\n");
     printf("\n+-------+-------+-------+\n");
-    printf("|   |   |   |   |   |   |\n");
-    printf("+-------+-------+-------+\n");
-
-
-    for (int i = 0; i < 1000000000; i++);
 
 
     srand(time(NULL));
     reel1 = rand() % 4;
     reel2 = rand() % 4;
-    reel3 = rand() % 4;
 
+    if (reel1 == reel2) {
+        multiplier_index = rand() % 5;
+        switch (multiplier_index) {
+            case 0: multiplier_value = 2; break;
+            case 1: multiplier_value = 3; break;
+            case 2: multiplier_value = 5; break;
+            case 3: multiplier_value = 10; break;
+            case 4: multiplier_value = 25; break;
+        }
+        reel3 = -1;
+    } else {
+        reel3 = rand() % 4;
+    }
+
+
+    for (int i = 0; i < 5; i++) {
+        printf("| %-5s | %-5s | %-5s |\n", symbols[rand() % 4], "|", "|");
+        printf("+-------+-------+-------+\n");
+        for (int j = 0; j < 50000000; j++);
+        clearScreen();
+        drawFrame();
+        printf("| Balance: %d coins    |\n", *balance);
+        printf("| Spinning...          |\n");
+        printf("+---------------------+\n");
+        printf("\n+-------+-------+-------+\n");
+    }
+    printf("| %-5s | %-5s | %-5s |\n", symbols[reel1], "|", "|");
+    printf("+-------+-------+-------+\n");
+
+
+    for (int i = 0; i < 5; i++) {
+        printf("| %-5s | %-5s | %-5s |\n", symbols[reel1], symbols[rand() % 4], "|");
+        printf("+-------+-------+-------+\n");
+        for (int j = 0; j < 50000000; j++);
+        clearScreen();
+        drawFrame();
+        printf("| Balance: %d coins    |\n", *balance);
+        printf("| Spinning...          |\n");
+        printf("+---------------------+\n");
+        printf("\n+-------+-------+-------+\n");
+    }
+    printf("| %-5s | %-5s | %-5s |\n", symbols[reel1], symbols[reel2], "|");
+    printf("+-------+-------+-------+\n");
+
+
+    for (int i = 0; i < 5; i++) {
+        printf("| %-5s | %-5s | %-5s |\n", symbols[reel1], symbols[reel2], (reel3 == -1) ? multipliers[rand() % 5] : symbols[rand() % 4]);
+        printf("+-------+-------+-------+\n");
+        for (int j = 0; j < 50000000; j++);
+        clearScreen();
+        drawFrame();
+        printf("| Balance: %d coins    |\n", *balance);
+        printf("| Spinning...          |\n");
+        printf("+---------------------+\n");
+        printf("\n+-------+-------+-------+\n");
+    }
 
     clearScreen();
     drawFrame();
@@ -94,16 +147,15 @@ void playGame(int *balance) {
     printf("| Results:             |\n");
     printf("+---------------------+\n");
     printf("\n+-------+-------+-------+\n");
-    printf("| %-5s | %-5s | %-5s |\n", symbols[reel1], symbols[reel2], symbols[reel3]);
+    printf("| %-5s | %-5s | %-5s |\n", symbols[reel1], symbols[reel2], (reel3 == -1) ? multipliers[multiplier_index] : symbols[reel3]);
     printf("+-------+-------+-------+\n");
 
-
-    if (reel1 == reel2 && reel2 == reel3) {
+    if (reel1 == reel2 && reel2 == reel3 && reel3 != -1) {
         printf("\n|     MAX WIN!!!    |\n");
         *balance += 100;
-    } else if (reel1 == reel2 || reel2 == reel3 || reel1 == reel3) {
-        printf("\n|     Small Win!    |\n");
-        *balance += 20;
+    } else if (reel1 == reel2 && reel3 == -1) {
+        printf("\n|     BIG WIN!!!    |\n");
+        *balance += 50 * multiplier_value;
     } else {
         printf("\n|     Try again     |\n");
     }
